@@ -1,0 +1,55 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "raggate"
+version = "0.1.0"
+description = "A thin, CI-gated evaluation gate for RAG & LLM systems: golden set, LLM-judge (or heuristic) scorers, and band-based quality gates."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Abhay Trivedi" }]
+keywords = ["rag", "llm", "evaluation", "evals", "ci", "faithfulness", "hallucination", "retrieval"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Typing :: Typed",
+]
+dependencies = [
+  "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+openai = ["openai>=1.30"]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[project.scripts]
+raggate = "raggate.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/abhay23-AI/raggate"
+Issues = "https://github.com/abhay23-AI/raggate/issues"
+Changelog = "https://github.com/abhay23-AI/raggate/blob/main/CHANGELOG.md"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/raggate"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+# templates.py embeds whole scaffold files as string constants — their line
+# lengths are the generated files' business, not this module's.
+"src/raggate/templates.py" = ["E501"]
