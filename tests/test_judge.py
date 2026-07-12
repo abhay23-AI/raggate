@@ -23,8 +23,13 @@ from raggate.judge import parse_score
         # bare integers on a 0..10 scale
         ("8", 0.8),
         ("Rating: 7", 0.7),
-        # clamping
+        # bare integers on a 0..100 scale
+        ("85", 0.85),
+        ("Rating: 42", 0.42),
+        # clamping out-of-range
         ("1.5", 1.0),
+        ("-0.5", 0.0),
+        ("-1", 0.0),
         # no number
         ("the answer is fully correct", None),
         ("", None),

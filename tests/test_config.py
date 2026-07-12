@@ -24,6 +24,24 @@ def test_override_merges_over_defaults(tmp_path):
     assert gates["answer_relevancy"]["fail"] == 0.65      # untouched metric intact
 
 
+def test_empty_metrics_block_falls_back_to_defaults(tmp_path):
+    # an explicitly empty `metrics:` (YAML -> None) means "no overrides"
+    gates = load_gates(_write(tmp_path, "metrics:\n"))
+    assert gates["faithfulness"]["fail"] == 0.75
+
+
+def test_custom_metric_merges_over_fallback_base(tmp_path):
+    p = _write(tmp_path, "metrics:\n  my_metric: {kpi: true, fail: 0.5, warn: 0.6, target: 0.7}\n")
+    gates = load_gates(p)
+    assert gates["my_metric"] == {"kpi": True, "fail": 0.5, "warn": 0.6, "target": 0.7}
+
+
+def test_non_numeric_band_rejected(tmp_path):
+    p = _write(tmp_path, "metrics:\n  faithfulness: {fail: high, warn: 0.8, target: 0.9}\n")
+    with pytest.raises(ValueError, match="needs numeric"):
+        load_gates(p)
+
+
 def test_inverted_thresholds_rejected(tmp_path):
     p = _write(tmp_path, "metrics:\n  faithfulness: {fail: 0.9, warn: 0.5, target: 0.8}\n")
     with pytest.raises(ValueError, match="fail <= warn <= target"):

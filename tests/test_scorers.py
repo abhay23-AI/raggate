@@ -56,9 +56,28 @@ def test_citation_support_none_when_no_citations():
     assert citation_support({}, {"answer": "x", "contexts": ["y"], "citations": []}, J) is None
 
 
-def test_answer_relevancy_and_correctness_ranges():
+def test_answer_relevancy_discriminates_on_topic_from_off_topic():
+    case = {"question": "How many vacation days do employees get?"}
+    on_topic = {"answer": "Employees get 20 vacation days per year.", "contexts": []}
+    off_topic = {"answer": "The weather in Paris is mild.", "contexts": []}
+    assert answer_relevancy(case, on_topic, J) > answer_relevancy(case, off_topic, J)
+
+
+def test_answer_correctness_range_and_empty():
     case = {"question": "How many vacation days?", "expected": "20 days"}
     out = {"answer": "Employees get 20 vacation days per year.", "contexts": []}
-    assert 0.0 <= answer_relevancy(case, out, J) <= 1.0
     assert answer_correctness(case, out, J) > 0.0
     assert answer_correctness(case, {"answer": "", "contexts": []}, J) == 0.0
+
+
+def test_scorers_see_single_digit_numbers():
+    # single digits carry facts — they must not be dropped as noise, or a wrong
+    # number scores as perfect on the token-level metrics.
+    from raggate.text import content_tokens
+
+    assert "5" in content_tokens("Up to 5 days")
+    case = {"expected": "Up to 5 days."}
+    right = answer_correctness(case, {"answer": "Up to 5 days.", "contexts": []}, J)
+    wrong = answer_correctness(case, {"answer": "Up to 8 days.", "contexts": []}, J)
+    assert right == 1.0
+    assert wrong < 1.0

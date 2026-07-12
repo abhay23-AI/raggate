@@ -116,7 +116,7 @@ Without the `OPENAI_API_KEY` secret the gate runs in heuristic mode (information
 
 `raggate` is inspired by these; if you want deep metrics or dashboards, use them — raggate is the thin gate that composes with them.
 
-- **[RAGAS](https://github.com/explodinglabs/ragas)** (Apache-2.0) — the reference library for RAG-specific metrics. raggate's LLM metrics approximate its constructs with pointwise judges; its faithfulness/context-recall definitions are the standard.
+- **[RAGAS](https://github.com/explodinggradients/ragas)** (Apache-2.0) — the reference library for RAG-specific metrics. raggate's LLM metrics approximate its constructs with pointwise judges; its faithfulness/context-recall definitions are the standard.
 - **[DeepEval](https://github.com/confident-ai/deepeval)** (Apache-2.0) — the broadest metric set and pytest-native gating. If you want assertions inside your test suite, use it.
 - **[promptfoo](https://github.com/promptfoo/promptfoo)** (MIT) — declarative eval + CI action with RAG assertions.
 - **[TruLens](https://github.com/truera/trulens)**, **[Arize Phoenix](https://github.com/Arize-ai/phoenix)** (Elastic-2.0, source-available), **[MLflow LLM eval](https://mlflow.org/docs/latest/genai/eval-monitor/)** — tracing/observability platforms.
