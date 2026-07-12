@@ -86,25 +86,36 @@ class Judge:
 
 
 _FRACTION = re.compile(r"(\d+(?:\.\d+)?)\s*(?:/|out of)\s*(\d+(?:\.\d+)?)")
+_PERCENT = re.compile(r"(-?\d+(?:\.\d+)?)\s*%")
 # A decimal already in [0,1], not embedded in a larger number (so "1.5" is not
 # read as ".5"). A leading "-" is captured so an out-of-range negative clamps to
 # 0.0 instead of being read as its positive magnitude.
 _DECIMAL_0_1 = re.compile(r"(?<![\d.])(-?(?:0?\.\d+|0|1(?:\.0+)?))(?![\d.])")
 _ANY_NUM = re.compile(r"-?\d+(?:\.\d+)?")
+# A European-style decimal comma between digits (e.g. "0,85"), not a thousands
+# grouping like "1,000".
+_EU_COMMA = re.compile(r"(?<=\d),(?=\d)(?!\d{3}(?:\D|$))")
 
 
 def parse_score(text: str) -> float | None:
     """Extract a 0..1 score from a judge reply, robustly.
 
-    Handles the ways models actually answer: "0.67", "2/3", "9 out of 10",
-    "Score: 8/10", and prose that contains an incidental count before the
-    score ("Based on 3 claims, 2 supported: 0.67" -> 0.67). Order of attempts:
-      1. an explicit fraction "a/b" or "a out of b"
-      2. a decimal already in [0, 1] (prefer the LAST one — usually the verdict)
-      3. otherwise the last number, rescaled from a 0..10 / 0..100 rating
+    Handles the ways models actually answer: "0.67", "85%", "2/3",
+    "9 out of 10", "Score: 8/10", "0,85" (EU comma), and prose with an
+    incidental count before the score ("Based on 3 claims, 2 supported: 0.67").
+    Order of attempts:
+      1. an explicit percentage "N%"     (10% -> 0.10)
+      2. an explicit fraction "a/b" or "a out of b"
+      3. a decimal already in [0, 1]     (prefer the LAST one — the verdict)
+      4. otherwise the last number, rescaled from a 0..10 / 0..100 rating
     """
     if not text:
         return None
+    text = _EU_COMMA.sub(".", text)  # normalize "0,85" -> "0.85"
+
+    pct = _PERCENT.search(text)
+    if pct:
+        return _clamp(float(pct.group(1)) / 100)
 
     frac = _FRACTION.search(text)
     if frac:

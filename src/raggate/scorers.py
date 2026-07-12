@@ -50,11 +50,14 @@ def faithfulness(case: dict, output: dict, judge: Judge) -> float | None:
     )
     if score is not None:
         return score
-    claims = sentences(answer)
-    if not claims:
+    # Only sentences with content tokens are measurable; a filler/all-stopword
+    # sentence is nothing-to-measure (coverage None) and must not sit in the
+    # denominator, or it would deflate a fully-grounded answer.
+    covs = [cov for c in sentences(answer) if (cov := coverage(c, ctx)) is not None]
+    if not covs:
         return None
-    supported = sum(1 for c in claims if (cov := coverage(c, ctx)) is not None and cov >= _SUPPORT)
-    return round(supported / len(claims), 4)
+    supported = sum(1 for cov in covs if cov >= _SUPPORT)
+    return round(supported / len(covs), 4)
 
 
 def answer_relevancy(case: dict, output: dict, judge: Judge) -> float | None:

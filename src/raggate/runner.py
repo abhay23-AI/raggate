@@ -74,6 +74,17 @@ def _as_str_list(value) -> list[str]:
     return [str(value)]
 
 
+def _as_list(value) -> list:
+    """Coerce to a list WITHOUT stringifying elements — citations may be dicts
+    or indices, and citation_support coerces each itself. A bare string/dict
+    becomes a one-element list (not exploded)."""
+    if value is None:
+        return []
+    if isinstance(value, (list, tuple)):
+        return list(value)
+    return [value]
+
+
 def _normalize_output(raw, case_id: str) -> dict:
     if not isinstance(raw, dict) or "answer" not in raw:
         raise TargetError(
@@ -84,7 +95,8 @@ def _normalize_output(raw, case_id: str) -> dict:
     return {
         "answer": answer if isinstance(answer, str) else ("" if answer is None else str(answer)),
         "contexts": _as_str_list(raw.get("contexts")),
-        "citations": _as_str_list(raw.get("citations")),
+        # citations keep their structure (dict/int/str) — the scorer coerces.
+        "citations": _as_list(raw.get("citations")),
     }
 
 
