@@ -14,7 +14,7 @@ from pathlib import Path
 from statistics import mean
 
 from .dataset import load_dataset
-from .judge import Judge
+from .judge import Judge, JudgeError
 from .scorers import SCORERS
 
 
@@ -127,6 +127,15 @@ def run_suite(
             if value is not None:
                 collected[m].append(value)
         per_case.append(row)
+
+    # A judge configured but 0/N calls succeeded is a broken configuration, not
+    # a heuristic run — fail loudly rather than silently gating on lexical proxies.
+    if judge.degraded:
+        raise JudgeError(
+            f"OpenAI judge '{judge.model}' was configured but all {judge.calls} "
+            f"rating calls failed (check OPENAI_API_KEY, connectivity, and quota). "
+            f"Refusing to gate on the lexical fallback."
+        )
 
     aggregate = {m: (round(mean(v), 4) if v else None) for m, v in collected.items()}
     return SuiteResult(

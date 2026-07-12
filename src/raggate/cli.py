@@ -10,6 +10,7 @@ from pathlib import Path
 from . import __version__, templates
 from .config import load_gates, load_judge
 from .gates import evaluate, has_kpi_failure
+from .judge import JudgeError
 from .report import render
 from .runner import TargetError, run_suite
 
@@ -105,7 +106,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         return args.func(args)
-    except (FileNotFoundError, ValueError, TargetError) as e:
+    except (FileNotFoundError, ValueError, TargetError, JudgeError) as e:
         print(f"error: {e}", file=sys.stderr)
         return 2
 

@@ -24,6 +24,15 @@ import re
 from statistics import mean
 
 
+class JudgeError(RuntimeError):
+    """The LLM judge is configured but not usable (e.g. every call failed).
+
+    Raised instead of silently falling back to lexical heuristics, so a broken
+    OPENAI_API_KEY can't quietly turn a "judge" run into an unlabelled heuristic
+    one that still gates a build.
+    """
+
+
 class Judge:
     def __init__(
         self,
@@ -35,6 +44,8 @@ class Judge:
         self.runs = max(1, int(os.environ.get("RAGGATE_JUDGE_RUNS", runs)))
         self.temperature = float(os.environ.get("RAGGATE_JUDGE_TEMPERATURE", temperature))
         self._client = self._make_client()
+        self.calls = 0        # LLM calls attempted
+        self.errors = 0       # of which raised (auth, network, rate limit, …)
 
     @property
     def backend(self) -> str:
@@ -43,6 +54,11 @@ class Judge:
     @property
     def available(self) -> bool:
         return self._client is not None
+
+    @property
+    def degraded(self) -> bool:
+        """openai judge configured, calls were attempted, and every one failed."""
+        return self._client is not None and self.calls > 0 and self.errors == self.calls
 
     def describe(self) -> str:
         if self._client is None:
@@ -71,6 +87,7 @@ class Judge:
         return round(mean(scores), 4) if scores else None
 
     def _one_call(self, system: str, user: str) -> float | None:
+        self.calls += 1
         try:
             resp = self._client.chat.completions.create(
                 model=self.model,
@@ -82,6 +99,7 @@ class Judge:
             )
             return parse_score(resp.choices[0].message.content or "")
         except Exception:
+            self.errors += 1
             return None
 
 

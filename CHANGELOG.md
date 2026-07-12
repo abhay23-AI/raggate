@@ -6,6 +6,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.2] — 2026-07-12
+
+### Fixed
+- `__version__` was hardcoded and could drift from the packaged version; it is
+  now derived from the installed metadata (single source of truth).
+
+### Changed
+- A configured OpenAI judge whose calls all fail (bad key, no network, quota)
+  now raises `JudgeError` instead of silently falling back to lexical scores and
+  gating on them — a broken key can no longer quietly pass or fail a build.
+
 ## [0.1.1] — 2026-07-12
 
 ### Fixed
@@ -36,6 +47,7 @@ Initial release.
   cheaper proxies this kit computes; they are **not** the RAGAS `context_recall`
   / NLI citation metrics. See the README metric table.
 
-[Unreleased]: https://github.com/abhay23-AI/raggate/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/abhay23-AI/raggate/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/abhay23-AI/raggate/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/abhay23-AI/raggate/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/abhay23-AI/raggate/releases/tag/v0.1.0

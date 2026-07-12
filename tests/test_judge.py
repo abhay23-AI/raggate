@@ -3,7 +3,32 @@ produce wrong scores, so it gets thorough coverage."""
 
 import pytest
 
-from raggate.judge import parse_score
+from raggate.judge import Judge, parse_score
+
+
+class _Boom:
+    """A stand-in OpenAI client whose every call raises (bad key / no network)."""
+
+    def __getattr__(self, _name):
+        return self
+
+    def create(self, **_kwargs):
+        raise RuntimeError("boom")
+
+
+def test_judge_tracks_degradation_when_all_calls_fail():
+    j = Judge()
+    j._client = _Boom()          # simulate a configured-but-broken judge
+    assert j.rate("system", "user") is None
+    assert j.calls >= 1
+    assert j.errors == j.calls
+    assert j.degraded is True
+
+
+def test_judge_not_degraded_in_heuristic_mode():
+    j = Judge()                  # no OPENAI_API_KEY -> heuristic
+    assert j.rate("s", "u") is None
+    assert j.degraded is False   # nothing was attempted; not a failure
 
 
 @pytest.mark.parametrize(

@@ -87,3 +87,31 @@ def test_target_run_exception_names_the_case(tmp_path):
     _mk_evals(tmp_path, "def run(q):\n    raise ValueError('boom')\n")
     with pytest.raises(TargetError, match="case 'a'"):
         run_suite(tmp_path)
+
+
+class _Boom:
+    """A stand-in OpenAI client whose every call raises."""
+
+    def __getattr__(self, _name):
+        return self
+
+    def create(self, **_kwargs):
+        raise RuntimeError("boom")
+
+
+def test_degraded_judge_raises_instead_of_silently_gating(tmp_path, monkeypatch):
+    # a configured judge whose every call fails must error, not fall back to
+    # lexical scores and gate on them
+    from raggate import runner
+    from raggate.judge import Judge, JudgeError
+
+    _mk_evals(tmp_path, "def run(q):\n    return {'answer': 'x', 'contexts': ['y']}\n")
+
+    def _broken_judge(**_kwargs):
+        j = Judge()
+        j._client = _Boom()
+        return j
+
+    monkeypatch.setattr(runner, "Judge", _broken_judge)
+    with pytest.raises(JudgeError, match="rating calls failed"):
+        run_suite(tmp_path)

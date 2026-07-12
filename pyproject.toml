@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "raggate"
-version = "0.1.1"
+version = "0.1.2"
 description = "A thin, CI-gated evaluation gate for RAG & LLM systems: golden set, LLM-judge (or heuristic) scorers, and band-based quality gates."
 readme = "README.md"
 requires-python = ">=3.10"
