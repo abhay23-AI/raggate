@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "raggate"
-version = "0.1.2"
+version = "0.1.3"
 description = "A thin, CI-gated evaluation gate for RAG & LLM systems: golden set, LLM-judge (or heuristic) scorers, and band-based quality gates."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -36,8 +36,10 @@ raggate = "raggate.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/abhay23-AI/raggate"
+Source = "https://github.com/abhay23-AI/raggate"
 Issues = "https://github.com/abhay23-AI/raggate/issues"
 Changelog = "https://github.com/abhay23-AI/raggate/blob/main/CHANGELOG.md"
+LinkedIn = "https://www.linkedin.com/"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/raggate"]

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -11,8 +12,13 @@ from . import __version__, templates
 from .config import load_gates, load_judge
 from .gates import evaluate, has_kpi_failure
 from .judge import JudgeError
-from .report import render
+from .report import markdown, render
 from .runner import TargetError, run_suite
+
+
+def _gate_passes(suite, results) -> bool:
+    """The gate blocks only on a KPI failure in a real (openai) judge run."""
+    return not (has_kpi_failure(results) and suite.backend == "openai")
 
 _SCAFFOLD = {
     "golden.json": templates.GOLDEN_JSON,
@@ -58,6 +64,16 @@ def _run(args):
         }
         Path(args.json).write_text(json.dumps(payload, indent=2))
         print(f"  wrote {args.json}")
+
+    # Native GitHub Actions reporting: append the score table to the run summary.
+    summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary_path:
+        md = markdown(results, suite.judge_desc, suite.n_cases, _gate_passes(suite, results))
+        try:
+            with open(summary_path, "a", encoding="utf-8") as fh:
+                fh.write(md)
+        except OSError:
+            pass  # never let reporting break the run
     return suite, results
 
 

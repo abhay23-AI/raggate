@@ -1,0 +1,46 @@
+name: "raggate — RAG/LLM eval gate"
+description: "Fail your CI when RAG/LLM answer quality drops below a threshold. Golden set + pass/warn/fail bands."
+author: "Abhay Trivedi"
+branding:
+  icon: check-square
+  color: green
+
+inputs:
+  dir:
+    description: "Evals directory (contains golden.json, gates.yaml, target.py)."
+    required: false
+    default: "evals"
+  gates:
+    description: "Gate config file. Defaults to <dir>/gates.yaml."
+    required: false
+    default: ""
+  openai-api-key:
+    description: "OpenAI API key to enable LLM-judge scoring. Omit for heuristic (informational) mode."
+    required: false
+    default: ""
+  python-version:
+    description: "Python version to run raggate with."
+    required: false
+    default: "3.12"
+  version:
+    description: "raggate version spec to install, e.g. '==0.2.0'. Empty installs the latest."
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+      with:
+        python-version: ${{ inputs.python-version }}
+    - name: Install raggate
+      shell: bash
+      run: pip install "raggate[openai]${{ inputs.version }}"
+    - name: Run the gate
+      shell: bash
+      env:
+        OPENAI_API_KEY: ${{ inputs.openai-api-key }}
+      run: |
+        args=(--dir "${{ inputs.dir }}")
+        if [ -n "${{ inputs.gates }}" ]; then args+=(--gates "${{ inputs.gates }}"); fi
+        raggate gate "${args[@]}"

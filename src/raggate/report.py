@@ -49,3 +49,29 @@ def render(results: list[GateResult], judge_desc: str, n_cases: int) -> str:
     lines.extend(_c("dim", n) for n in note)
     lines.append("")
     return "\n".join(lines)
+
+
+_BAND_EMOJI = {PASS: "🟢", WARN: "🟡", FAIL: "🔴", "N/A": "⚪"}
+
+
+def markdown(results: list[GateResult], judge_desc: str, n_cases: int, passed: bool) -> str:
+    """A GitHub-flavored markdown summary — written to $GITHUB_STEP_SUMMARY so the
+    score table shows up natively on the Actions run and PR checks page."""
+    status = "✅ **passed**" if passed else "❌ **failed**"
+    rows = [
+        "### raggate — RAG/LLM eval gate",
+        "",
+        f"{status} · {n_cases} case(s) · judge: `{judge_desc}`",
+        "",
+        "| Metric | Score | Target | Band | |",
+        "|---|---:|---:|:--|---|",
+    ]
+    for r in results:
+        score = "n/a" if r.value is None else f"{r.value:.3f}"
+        target = "—" if r.target is None else f"{r.target:.3f}"
+        kind = "" if r.is_kpi else "diagnostic"
+        emoji = _BAND_EMOJI.get(r.band, "")
+        rows.append(f"| `{r.metric}` | {score} | {target} | {r.band} | {emoji} {kind} |")
+    if judge_desc == "heuristic":
+        rows += ["", "> Heuristic mode — informational only; set `OPENAI_API_KEY` to enforce."]
+    return "\n".join(rows) + "\n"

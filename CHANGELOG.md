@@ -6,6 +6,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.3] — 2026-07-12
+
+### Added
+- **GitHub Action** (`action.yml`) — `uses: abhay23-AI/raggate@v1` runs the gate in three lines.
+- Native **GitHub Actions reporting**: the score table is written to `$GITHUB_STEP_SUMMARY`,
+  so pass/warn/fail shows on the run summary and PR checks page.
+- `examples/quickstart/` runnable sample, issue/PR templates, and framework recipes.
+
+### Changed
+- README rewritten for the 10-second skim: value prop, comparison table, Action-first CI docs.
+
 ## [0.1.2] — 2026-07-12
 
 ### Fixed
@@ -47,7 +58,8 @@ Initial release.
   cheaper proxies this kit computes; they are **not** the RAGAS `context_recall`
   / NLI citation metrics. See the README metric table.
 
-[Unreleased]: https://github.com/abhay23-AI/raggate/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/abhay23-AI/raggate/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/abhay23-AI/raggate/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/abhay23-AI/raggate/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/abhay23-AI/raggate/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/abhay23-AI/raggate/releases/tag/v0.1.0
