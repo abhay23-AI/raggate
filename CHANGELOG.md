@@ -6,6 +6,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.1] — 2026-07-12
+
+### Fixed
+- README used relative links to `LICENSE`, `CONTRIBUTING.md`, and `pyproject.toml`,
+  which 404'd on the PyPI project page. Point them at absolute GitHub URLs so they
+  resolve on both GitHub and PyPI.
+
 ## [0.1.0] — 2026-07-12
 
 Initial release.
@@ -29,5 +36,6 @@ Initial release.
   cheaper proxies this kit computes; they are **not** the RAGAS `context_recall`
   / NLI citation metrics. See the README metric table.
 
-[Unreleased]: https://github.com/abhay23-AI/raggate/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/abhay23-AI/raggate/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/abhay23-AI/raggate/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/abhay23-AI/raggate/releases/tag/v0.1.0
