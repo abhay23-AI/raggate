@@ -26,6 +26,15 @@ from raggate.judge import parse_score
         # bare integers on a 0..100 scale
         ("85", 0.85),
         ("Rating: 42", 0.42),
+        # percentages (a failing 10% must NOT read as a perfect 1.0)
+        ("10%", 0.10),
+        ("5%", 0.05),
+        ("85%", 0.85),
+        ("85.5%", pytest.approx(0.855)),
+        ("100%", 1.0),
+        # European decimal comma
+        ("0,85", 0.85),
+        ("1,0", 1.0),
         # clamping out-of-range
         ("1.5", 1.0),
         ("-0.5", 0.0),

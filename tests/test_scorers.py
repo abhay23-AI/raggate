@@ -56,6 +56,29 @@ def test_citation_support_none_when_no_citations():
     assert citation_support({}, {"answer": "x", "contexts": ["y"], "citations": []}, J) is None
 
 
+def test_citation_support_dict_citation_via_runner():
+    # a dict citation that survives normalization must score by its text, not its repr
+    from raggate.runner import _normalize_output
+
+    out = _normalize_output(
+        {"answer": "", "contexts": ["The capital of France is Paris."],
+         "citations": [{"text": "Paris"}]},
+        "c",
+    )
+    assert citation_support({}, out, J) == 1.0
+
+
+def test_faithfulness_ignores_content_free_filler_sentence():
+    ctx = {"contexts": ["The Eiffel Tower is in Paris."]}
+    grounded = faithfulness({}, {"answer": "The Eiffel Tower is in Paris.", **ctx}, J)
+    filler_answer = "The Eiffel Tower is in Paris. It is what it is."
+    with_filler = faithfulness({}, {"answer": filler_answer, **ctx}, J)
+    assert grounded == 1.0
+    assert with_filler == 1.0  # the filler sentence must not deflate the score
+    # an entirely content-free answer is nothing-to-measure -> None
+    assert faithfulness({}, {"answer": "It is. They are.", **ctx}, J) is None
+
+
 def test_answer_relevancy_discriminates_on_topic_from_off_topic():
     case = {"question": "How many vacation days do employees get?"}
     on_topic = {"answer": "Employees get 20 vacation days per year.", "contexts": []}

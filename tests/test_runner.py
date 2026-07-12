@@ -46,11 +46,19 @@ def test_normalize_output_requires_answer():
         _normalize_output(["not", "a", "dict"], "case-1")
 
 
-def test_normalize_output_coerces_types():
-    out = _normalize_output({"answer": 42, "contexts": "one", "citations": [1, 2]}, "c")
+def test_normalize_output_coerces_answer_and_contexts():
+    out = _normalize_output({"answer": 42, "contexts": "one"}, "c")
     assert out["answer"] == "42"
     assert out["contexts"] == ["one"]
-    assert out["citations"] == ["1", "2"]
+
+
+def test_normalize_output_preserves_citation_structure():
+    # citations must NOT be stringified — the scorer coerces dict/int itself
+    out = _normalize_output({"answer": "a", "citations": [{"text": "Paris"}, 3]}, "c")
+    assert out["citations"] == [{"text": "Paris"}, 3]
+    # a single dict citation becomes a one-element list, not exploded
+    out2 = _normalize_output({"answer": "a", "citations": {"text": "x"}}, "c")
+    assert out2["citations"] == [{"text": "x"}]
 
 
 def _mk_evals(tmp_path, target_src):
