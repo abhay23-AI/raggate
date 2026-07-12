@@ -2,9 +2,10 @@
 
 A thin, CI-gated evaluation gate for RAG & LLM systems. Point it at a golden set, pick pass/warn/fail bands, and it fails your build when answer quality regresses. Runs with **no API key** (lexical heuristic scorers) and upgrades to **LLM-as-judge** scoring when you set `OPENAI_API_KEY`.
 
+[![PyPI](https://img.shields.io/pypi/v/raggate.svg)](https://pypi.org/project/raggate/)
 [![eval-gate](https://github.com/abhay23-AI/raggate/actions/workflows/eval.yml/badge.svg)](https://github.com/abhay23-AI/raggate/actions/workflows/eval.yml)
-[![license: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/abhay23-AI/raggate/blob/main/LICENSE)
-[![python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://github.com/abhay23-AI/raggate/blob/main/pyproject.toml)
+[![python](https://img.shields.io/pypi/pyversions/raggate.svg)](https://pypi.org/project/raggate/)
+[![license: MIT](https://img.shields.io/pypi/l/raggate.svg)](https://github.com/abhay23-AI/raggate/blob/main/LICENSE)
 
 It is deliberately small. It does not replace RAGAS or DeepEval — it is the drop-in gate you wire into GitHub Actions in five minutes, and it composes with them (see [Prior art](#prior-art)).
 
