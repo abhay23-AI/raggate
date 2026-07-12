@@ -1,0 +1,38 @@
+# Band-based quality gates (a metric FAILs below `fail`, WARNs below `warn`,
+# else PASSes). Only metrics with `kpi: true` can block a deploy. These are
+# starting points for general-purpose RAG — tune them to your domain.
+#
+# The `judge` block pins the LLM used to score in openai mode. Scores are only
+# comparable against the same judge; changing it invalidates your thresholds.
+# `runs` > 1 averages several judge calls per rating to damp variance.
+judge:
+  model: gpt-4.1-mini
+  runs: 1
+  temperature: 0.0
+
+metrics:
+  faithfulness:        # hallucination guardrail — held to the highest bar
+    kpi: true
+    fail: 0.75
+    warn: 0.85
+    target: 0.90
+  answer_relevancy:
+    kpi: true
+    fail: 0.65
+    warn: 0.75
+    target: 0.80
+  citation_support:    # project convention — no industry-standard number
+    kpi: true
+    fail: 0.65
+    warn: 0.75
+    target: 0.85
+  context_coverage:
+    kpi: true
+    fail: 0.60
+    warn: 0.70
+    target: 0.80
+  answer_correctness:  # wide band on purpose — a known-noisy metric
+    kpi: true
+    fail: 0.60
+    warn: 0.75
+    target: 0.85
