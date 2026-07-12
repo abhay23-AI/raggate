@@ -101,9 +101,10 @@ GATES_HIGH_STAKES_YAML = r"""# High-stakes profile for regulated / safety-critic
 # finance). Use with: `raggate gate --gates evals/gates.high-stakes.yaml`
 #
 # Rationale: Stanford RegLab found commercial RAG-based legal tools hallucinate
-# 17-33% of the time — a 0.70 faithfulness floor would let a system that is
-# wrong a third of the time PASS. Here faithfulness and citation floors sit at
-# 0.90+, and a human-in-the-loop is still recommended above these gates.
+# 17-33% of the time, so general-purpose floors are unsafe in these domains.
+# (faithfulness measures grounding in retrieved context, not correctness against
+# ground truth — a related but distinct concern.) Here faithfulness and citation
+# floors sit at 0.90+, and a human-in-the-loop is still recommended above them.
 judge:
   model: gpt-4.1-mini
   runs: 3            # average 3 calls to reduce judge variance on hard cases

@@ -85,9 +85,9 @@ metrics:
   context_coverage: { kpi: true, fail: 0.60, warn: 0.70, target: 0.80 }
 ```
 
-`FAIL` blocks the merge (KPI metrics only). `WARN` reports but passes. Diagnostic (non-KPI) metrics inform without gating. Bands *absorb* variance — they don't remove it — so pin the judge and raise `runs` for high-variance metrics.
+`FAIL` blocks the merge (KPI metrics only). `WARN` reports but passes. Diagnostic (non-KPI) metrics inform without gating. Gating is only enforced in **openai mode** (a judge is configured); **heuristic mode never blocks**. Bands *absorb* variance — they don't remove it — so pin the judge and raise `runs` for high-variance metrics.
 
-**Defaults are starting points for general-purpose RAG, not domain-calibrated.** `faithfulness` carries the highest bar because it is the hallucination guardrail. For regulated domains, use the shipped high-stakes profile (Stanford RegLab found commercial legal RAG tools hallucinate [17–33%](https://law.stanford.edu/publications/hallucination-free-assessing-the-reliability-of-leading-ai-legal-research-tools/) — the general defaults are unsafe there):
+**Defaults are starting points for general-purpose RAG, not domain-calibrated.** `faithfulness` carries the highest bar because it is the hallucination guardrail. For regulated domains, use the shipped high-stakes profile — Stanford RegLab found commercial legal RAG tools hallucinate [17–33%](https://reglab.stanford.edu/publications/hallucination-free-assessing-the-reliability-of-leading-ai-legal-research-tools/) of the time, so general-purpose faithfulness/citation floors are unsafe there (note: raggate's `faithfulness` measures grounding in retrieved context, not legal correctness — a distinct concern, but the direction holds):
 
 ```bash
 raggate gate --gates evals/gates.high-stakes.yaml   # faithfulness/citation floors ≥ 0.90
@@ -125,7 +125,7 @@ Without the `OPENAI_API_KEY` secret the gate runs in heuristic mode (information
 
 1. Retrieval quality (`context_coverage`) is measured separately from generation — most "the LLM is dumb" bugs are retrieval misses.
 2. The golden set is versioned and small. Ten sharp cases you trust beat a thousand you don't; grow it every time a bug reaches production.
-3. Heuristic mode is a smoke test, not a validated metric. Only the LLM path gates.
+3. Gating is enforced only in openai mode; heuristic mode (no key) is a smoke test and never blocks. Note `citation_support` and `context_coverage` are deterministic overlap metrics with no LLM path — they still gate in openai mode.
 
 ## Roadmap
 
