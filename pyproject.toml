@@ -29,7 +29,7 @@ dependencies = [
 
 [project.optional-dependencies]
 openai = ["openai>=1.30"]
-dev = ["pytest>=8.0", "ruff>=0.6"]
+dev = ["pytest>=8.0", "ruff>=0.15,<0.16"]  # bounded so CI matches the pinned pre-commit ruff
 
 [project.scripts]
 raggate = "raggate.cli:main"
