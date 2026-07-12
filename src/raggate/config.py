@@ -27,7 +27,9 @@ def load_gates(path: str | Path) -> dict[str, dict]:
     merged over the defaults, so you can tweak one threshold without restating
     the rest. Raises ValueError on a malformed file or inverted thresholds."""
     gates = copy.deepcopy(DEFAULT_GATES)
-    metrics = _read(path).get("metrics", {})
+    # `or {}` so an explicitly empty `metrics:` block (YAML -> None) falls back to
+    # defaults, like a missing key — matching how the judge block is handled.
+    metrics = _read(path).get("metrics") or {}
     if not isinstance(metrics, dict):
         raise ValueError(f"{path}: 'metrics' must be a mapping of metric -> thresholds")
 

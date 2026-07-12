@@ -87,9 +87,10 @@ class Judge:
 
 _FRACTION = re.compile(r"(\d+(?:\.\d+)?)\s*(?:/|out of)\s*(\d+(?:\.\d+)?)")
 # A decimal already in [0,1], not embedded in a larger number (so "1.5" is not
-# read as ".5", and "0.67" inside "1.5x" is not mismatched).
-_DECIMAL_0_1 = re.compile(r"(?<![\d.])(?:0?\.\d+|0|1(?:\.0+)?)(?![\d.])")
-_ANY_NUM = re.compile(r"\d+(?:\.\d+)?")
+# read as ".5"). A leading "-" is captured so an out-of-range negative clamps to
+# 0.0 instead of being read as its positive magnitude.
+_DECIMAL_0_1 = re.compile(r"(?<![\d.])(-?(?:0?\.\d+|0|1(?:\.0+)?))(?![\d.])")
+_ANY_NUM = re.compile(r"-?\d+(?:\.\d+)?")
 
 
 def parse_score(text: str) -> float | None:

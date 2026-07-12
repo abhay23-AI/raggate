@@ -171,11 +171,13 @@ CORPUS = [
 ]
 
 _WORD = re.compile(r"[a-z0-9]+")
-_STOP = set("a an the of to in is are do does how many what within per and or for".split())
+_STOP = {"a", "an", "the", "of", "to", "in", "is", "are", "do", "does",
+         "how", "many", "what", "within", "per", "and", "or", "for"}
 
 
 def _tokens(text):
-    return {w for w in _WORD.findall(text.lower()) if w not in _STOP and len(w) > 1}
+    return {w for w in _WORD.findall(text.lower())
+            if w not in _STOP and (len(w) > 1 or w.isdigit())}
 
 
 def _sentences(text):

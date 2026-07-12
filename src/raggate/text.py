@@ -31,8 +31,9 @@ def tokenize(text: str) -> list[str]:
 
 
 def content_tokens(text: str) -> set[str]:
-    """Meaning-bearing tokens (stopwords removed, single chars dropped)."""
-    return {t for t in tokenize(text) if t not in _STOP and len(t) > 1}
+    """Meaning-bearing tokens: stopwords removed, single-letter noise dropped —
+    but single digits kept (0-9 carry facts the numeric-extraction cases test)."""
+    return {t for t in tokenize(text) if t not in _STOP and (len(t) > 1 or t.isdigit())}
 
 
 def coverage(needle: str, haystack: str) -> float | None:
