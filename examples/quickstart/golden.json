@@ -1,0 +1,48 @@
+{
+  "version": "1.0.0",
+  "description": "Sample golden set over a tiny fake company handbook. Replace with 10+ real cases from your own domain.",
+  "cases": [
+    {
+      "id": "vacation-days",
+      "question": "How many vacation days do employees get per year?",
+      "expected": "20 days of paid vacation per year.",
+      "category": "numerical-extraction",
+      "difficulty": "easy"
+    },
+    {
+      "id": "vacation-rollover",
+      "question": "How many unused vacation days can roll over to next year?",
+      "expected": "Up to 5 days.",
+      "category": "numerical-extraction",
+      "difficulty": "easy"
+    },
+    {
+      "id": "core-hours",
+      "question": "What are the core collaboration hours?",
+      "expected": "10am to 4pm.",
+      "category": "metadata-query",
+      "difficulty": "easy"
+    },
+    {
+      "id": "expense-window",
+      "question": "Within how many days must expense reports be submitted?",
+      "expected": "Within 30 days of purchase.",
+      "category": "policy",
+      "difficulty": "easy"
+    },
+    {
+      "id": "insurance-employee",
+      "question": "What percentage of the health insurance premium does the company cover for employees?",
+      "expected": "80 percent for employees.",
+      "category": "numerical-extraction",
+      "difficulty": "medium"
+    },
+    {
+      "id": "probation-period",
+      "question": "How long is the probation period and what notice applies?",
+      "expected": "90 days, during which either party may end employment with two weeks notice.",
+      "category": "policy-recommendation",
+      "difficulty": "medium"
+    }
+  ]
+}

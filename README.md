@@ -7,7 +7,9 @@ A thin, CI-gated evaluation gate for RAG & LLM systems. Point it at a golden set
 [![python](https://img.shields.io/pypi/pyversions/raggate.svg)](https://pypi.org/project/raggate/)
 [![license: MIT](https://img.shields.io/pypi/l/raggate.svg)](https://github.com/abhay23-AI/raggate/blob/main/LICENSE)
 
-It is deliberately small. It does not replace RAGAS or DeepEval — it is the drop-in gate you wire into GitHub Actions in five minutes, and it composes with them (see [Prior art](#prior-art)).
+**Fail your CI when RAG/LLM answer quality drops below a threshold.** The part RAGAS and DeepEval leave out: a hard **pass / warn / fail gate** you drop straight into a pull request.
+
+It is deliberately small. It does not replace RAGAS or DeepEval — it is the drop-in gate you wire into GitHub Actions in five minutes, and it composes with them (see [How it compares](#how-it-compares)).
 
 ## Why
 
@@ -24,6 +26,10 @@ raggate init          # scaffolds ./evals (golden set, gates.yaml, target.py)
 raggate run           # scores the golden set, prints a banded report
 raggate gate          # same, but exits non-zero when a KPI metric FAILs
 ```
+
+<!-- Demo GIF: render docs/demo.tape with `vhs docs/demo.tape` (see docs/demo.tape),
+     commit docs/demo.gif, then add:  ![raggate in CI](docs/demo.gif)  right here.
+     A 15s GIF above the fold is the single biggest README click-through win. -->
 
 `raggate run` scores a tiny built-in example immediately:
 
@@ -94,24 +100,51 @@ metrics:
 raggate gate --gates evals/gates.high-stakes.yaml   # faithfulness/citation floors ≥ 0.90
 ```
 
-## CI gate (GitHub Actions)
+## GitHub Action
+
+raggate ships as a composite Action — the whole gate in three lines:
 
 ```yaml
-name: eval-gate
+# .github/workflows/rag-quality.yml
+name: rag-quality
 on: [pull_request]
 jobs:
-  eval:
+  gate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: "3.12" }
+      - uses: abhay23-AI/raggate@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}   # omit for heuristic mode
+```
+
+The score table is written to the **GitHub Actions run summary** automatically (via `$GITHUB_STEP_SUMMARY`), so you see pass/warn/fail on the PR checks page without opening logs. Inputs: `dir` (default `evals`), `gates`, `openai-api-key`, `python-version`, `version`.
+
+Prefer to run it yourself? It's just the CLI:
+
+```yaml
       - run: pip install "raggate[openai]"
       - run: raggate gate
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
 
 Without the `OPENAI_API_KEY` secret the gate runs in heuristic mode (informational, never blocks). Add the secret to make it a hard quality gate.
+
+## How it compares
+
+raggate is a *gate*, not a framework. Use it with the others, not instead of them.
+
+| | **raggate** | RAGAS | DeepEval | promptfoo |
+|---|:--:|:--:|:--:|:--:|
+| Primary job | **CI pass/fail gate** | metric library | metric library + asserts | prompt eval + red-team |
+| Runs with no API key | ✅ (heuristic) | ⚠️ limited | ⚠️ limited | ✅ |
+| pass / **warn** / fail bands | ✅ | ✗ | threshold | threshold |
+| One-line GitHub Action | ✅ | ✗ | ✗ | ✅ |
+| Breadth of metrics | 🔸 focused (5) | ✅ many | ✅ **most** | ✅ many |
+| Dashboards / tracing | ✗ | ✗ | ✅ (SaaS) | 🔸 |
+| Dependency weight | **tiny** (1 dep) | medium | medium | medium |
+
+Where they're stronger: **RAGAS/DeepEval** have far more metrics and DeepEval has a hosted dashboard; **promptfoo** does prompt comparison and red-teaming. If you want depth or dashboards, use those for scoring — raggate is the thin gate that turns any of them into a merge-blocking check.
 
 ## Prior art
 
@@ -139,6 +172,10 @@ Without the `OPENAI_API_KEY` secret the gate runs in heuristic mode (information
 ## Contributing
 
 Issues and PRs welcome — see [CONTRIBUTING.md](https://github.com/abhay23-AI/raggate/blob/main/CONTRIBUTING.md). Every metric must run in heuristic mode (no API key) and ship with a test.
+
+## Maintainer
+
+Built and maintained by **Abhay Trivedi** — I build production-grade AI systems and help teams put real eval gates around production RAG/LLM pipelines. Open an issue for the tool, or reach me on [LinkedIn](https://www.linkedin.com/) if you want help wiring evals into your stack.
 
 ## License
 
